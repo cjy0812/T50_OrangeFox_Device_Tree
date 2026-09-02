@@ -5,6 +5,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-add_lunch_combo omni_tb8786p1_64_k510_wifi-user
-add_lunch_combo omni_tb8786p1_64_k510_wifi-userdebug
-add_lunch_combo omni_tb8786p1_64_k510_wifi-eng
+add_lunch_combo twrp_tb8786p1_64_k510_wifi-user
+add_lunch_combo twrp_tb8786p1_64_k510_wifi-userdebug
+add_lunch_combo twrp_tb8786p1_64_k510_wifi-eng
