@@ -83,9 +83,14 @@ BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 
 # vendor_boot recovery (OrangeFox)
+# Evidence: stock vendor_boot has only 1 PLATFORM fragment (20.9 MB), no RECOVERY fragment
+# Evidence: BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT creates empty PLATFORM (20 bytes)
+#   + RECOVERY fragment → MediaTek bootloader can't boot normal mode → bootloop
+# Solution: Keep FOX_VENDOR_BOOT_RECOVERY but do NOT set BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT
+#   → Recovery resources go into vendor_boot PLATFORM fragment (like stock)
+#   → No RECOVERY fragment created → MediaTek bootloader can load PLATFORM normally
 FOX_VENDOR_BOOT_RECOVERY := 1
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
-BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 BOARD_MOVE_GSI_AVB_KEYS_TO_VENDOR_BOOT := true
 
 # Partitions
