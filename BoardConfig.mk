@@ -44,9 +44,10 @@ AB_OTA_PARTITIONS += \
     product
 
 # Kernel & vendor_boot recovery
-# Evidence: vendor_boot_a.bin kernel_size=4 (invalid) → no kernel in vendor_boot
-# Evidence: boot_a.bin header_version=4, page_size=4096
-# Evidence: vendor_boot cmdline = bootopt=64S3,32N2,64N2 ...
+# Evidence: vendor_boot_a.bin header_v4 parsed with AOSP vendor_boot_img_hdr_v3 layout
+# Evidence: kernel_addr=0x40080000, ramdisk_addr=0x47c80000
+# Evidence: tags_addr=0x4bc80000, dtb_addr=0x4bc80000 (from stock vendor_boot_a.bin)
+# Evidence: page_size=4096, header_size=2128
 TARGET_NO_KERNEL := true
 TARGET_NO_RECOVERY := true
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
@@ -55,8 +56,8 @@ BOARD_KERNEL_PAGESIZE := 4096
 BOARD_KERNEL_BASE := 0x40078000
 BOARD_KERNEL_OFFSET := 0x00008000
 BOARD_RAMDISK_OFFSET := 0x07c08000
-BOARD_KERNEL_TAGS_OFFSET := 0x07c08000
-BOARD_DTB_OFFSET := 0x07c08000
+BOARD_KERNEL_TAGS_OFFSET := 0x0bc08000
+BOARD_DTB_OFFSET := 0x0bc08000
 
 # DTB
 # Evidence: vendor_boot_a.bin contains MTK DTBO pool (magic=0xd7b7ab1e)
