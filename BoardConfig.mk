@@ -48,8 +48,8 @@ AB_OTA_PARTITIONS += \
 # Evidence: kernel_addr=0x40080000, ramdisk_addr=0x47c80000
 # Evidence: tags_addr=0x4bc80000, dtb_addr=0x4bc80000 (from stock vendor_boot_a.bin)
 # Evidence: page_size=4096, header_size=2128
-TARGET_NO_KERNEL := true
-TARGET_NO_RECOVERY := true
+TARGET_NO_KERNEL := false
+TARGET_NO_RECOVERY := false
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_KERNEL_PAGESIZE := 4096
@@ -68,6 +68,11 @@ BOARD_DTB_OFFSET := 0x0bc08000
 BOARD_KERNEL_SEPARATED_DTBO := true
 TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img
 
+# Prebuilt kernel
+# Evidence: extracted from stock boot_a.bin (gzip compressed, 20MB)
+# Required for BOARD_USES_RECOVERY_AS_BOOT (boot.img = kernel + recovery ramdisk)
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
+
 # vendor_cmdline
 # Evidence: extracted from vendor_boot_a.bin header offset 0x1C
 BOARD_VENDOR_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive
@@ -82,15 +87,15 @@ BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 
-# vendor_boot recovery (OrangeFox)
-# Evidence: stock vendor_boot has only 1 PLATFORM fragment (20.9 MB), no RECOVERY fragment
-# Evidence: BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT creates empty PLATFORM (20 bytes)
-#   + RECOVERY fragment → MediaTek bootloader can't boot normal mode → bootloop
-# Solution: Keep FOX_VENDOR_BOOT_RECOVERY but do NOT set BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT
-#   → Recovery resources go into vendor_boot PLATFORM fragment (like stock)
-#   → No RECOVERY fragment created → MediaTek bootloader can load PLATFORM normally
-FOX_VENDOR_BOOT_RECOVERY := 1
-BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
+# Recovery mode: BOARD_USES_RECOVERY_AS_BOOT
+# Evidence: FOX_VENDOR_BOOT_RECOVERY creates empty PLATFORM fragment (20 bytes) in vendor_boot
+#   → MediaTek bootloader can't boot normal mode → bootloop
+# Evidence: stock vendor_boot has 1 PLATFORM fragment (20.9 MB), no RECOVERY fragment
+# Solution: Use BOARD_USES_RECOVERY_AS_BOOT=true (standard A/B recovery pattern)
+#   → Recovery ramdisk goes into boot.img (kernel + recovery ramdisk)
+#   → vendor_boot stays as stock (PLATFORM only) → normal boot still works
+#   → To enter recovery: reboot recovery from OS, or hold VolUp+Power
+BOARD_USES_RECOVERY_AS_BOOT := true
 BOARD_MOVE_GSI_AVB_KEYS_TO_VENDOR_BOOT := true
 
 # Partitions
