@@ -120,5 +120,8 @@ BOARD_AVB_ENABLE := true
 
 # TWRP / OrangeFox UI
 TW_THEME := portrait_hdpi
+TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
+TW_MAX_BRIGHTNESS := 255
+TW_DEFAULT_BRIGHTNESS := 128
 TW_EXTRA_LANGUAGES := true
 TW_INCLUDE_REPACKTOOLS := true
