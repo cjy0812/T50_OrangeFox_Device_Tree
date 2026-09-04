@@ -130,9 +130,19 @@ ALLOW_MISSING_DEPENDENCIES := true
 BOARD_AVB_ENABLE := true
 
 # TWRP / OrangeFox UI
-TW_THEME := portrait_hdpi
+# Screen rotation for landscape tablet (2400x1600)
+# Reference: Lenovo TB522FU uses landscape_hdpi + TW_ROTATION:=0
+# Reference: GPD XD+ (MTK tablet) uses landscape_hdpi + TW_ROTATION:=270 + touch adjustment
+TARGET_SCREEN_WIDTH  := 2400
+TARGET_SCREEN_HEIGHT := 1600
+TW_THEME            := landscape_hdpi
+TW_ROTATION         := 0
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 255
 TW_DEFAULT_BRIGHTNESS := 128
+
+# Touchscreen coordinate adjustment (uncomment if needed after testing)
+# RECOVERY_TOUCHSCREEN_SWAP_XY := true
+# RECOVERY_TOUCHSCREEN_FLIP_Y := true
 TW_EXTRA_LANGUAGES := true
 TW_INCLUDE_REPACKTOOLS := true
