@@ -5,8 +5,9 @@ on init
 
 on fs
     # distinguish USB should connect or not, i.e. CDP vs SDP
-    # Fixed: removed property:ro.debuggable=0 condition (device is userdebug with ro.debuggable=1)
-    # Original MTK template had this condition which prevented adbd from starting
+    # Root cause: default.prop has persist.sys.usb.config=none (from vendor/odm/product partitions)
+    # which overrides the earlier =adb. Force set here after all props are loaded.
+    setprop persist.sys.usb.config adb
     write /sys/class/udc/musb-hdrc/device/cmode 2
     # set charging free due to it wait for USB activation
     start adbd
