@@ -130,19 +130,25 @@ ALLOW_MISSING_DEPENDENCIES := true
 BOARD_AVB_ENABLE := true
 
 # TWRP / OrangeFox UI
-# Screen rotation for landscape tablet (2400x1600)
+# Screen for landscape tablet (2400x1600)
 # NOTE: OrangeFox R12.1 only has portrait_hdpi and watch_mdpi themes
 #       landscape_hdpi does NOT exist → causes "Theme selection failed" build error
-# Solution: Use portrait_hdpi + TW_ROTATION=270 to rotate UI to landscape
-# Reference: GPD XD+ (MTK tablet) uses portrait_hdpi + TW_ROTATION:=270
+#
+# Rotation fix (2026-09-04):
+#   TW_ROTATION:=270 caused 180° upside-down display (confirmed by device test)
+#   Community practice (Samsung Note10.1, Tolino tablet): use TW_ROTATION:=0
+#   with RECOVERY_TOUCHSCREEN_* for touch coordinate adjustment
+# Reference: omnirom/android_device_samsung_n5100, Ryogo-X/tolino_ntx_6sl_twrp
 TW_THEME            := portrait_hdpi
-TW_ROTATION         := 270
+TW_ROTATION         := 0
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 255
 TW_DEFAULT_BRIGHTNESS := 128
 
-# Touchscreen coordinate adjustment (uncomment if needed after testing)
-# RECOVERY_TOUCHSCREEN_SWAP_XY := true
-# RECOVERY_TOUCHSCREEN_FLIP_Y := true
+# Touchscreen coordinate adjustment for landscape tablet
+# Required: swap X/Y axes because physical screen is landscape but UI is portrait
+# Reference: Samsung Galaxy Note 10.1 uses same config
+RECOVERY_TOUCHSCREEN_SWAP_XY := true
+RECOVERY_TOUCHSCREEN_FLIP_Y := true
 TW_EXTRA_LANGUAGES := true
 TW_INCLUDE_REPACKTOOLS := true
