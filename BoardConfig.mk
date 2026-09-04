@@ -119,7 +119,10 @@ BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 TARGET_COPY_OUT_VENDOR := vendor
 
 # Recovery
-TARGET_RECOVERY_PIXEL_FORMAT := BGRA_8888
+# Pixel format fix (2026-09-05): BGRA_8888 → RGBA_8888
+# Evidence: Vernee M5 (MTK platform, same as T50) uses RGBA_8888
+# BGRA caused red-blue channel swap → blue/purple tint on display
+TARGET_RECOVERY_PIXEL_FORMAT := RGBA_8888
 TARGET_USES_LOGD := true
 BOARD_HAS_NO_SELECT_BUTTON := true
 
@@ -134,21 +137,23 @@ BOARD_AVB_ENABLE := true
 # NOTE: OrangeFox R12.1 only has portrait_hdpi and watch_mdpi themes
 #       landscape_hdpi does NOT exist → causes "Theme selection failed" build error
 #
-# Rotation fix (2026-09-04):
-#   TW_ROTATION:=270 caused 180° upside-down display (confirmed by device test)
-#   Community practice (Samsung Note10.1, Tolino tablet): use TW_ROTATION:=0
-#   with RECOVERY_TOUCHSCREEN_* for touch coordinate adjustment
-# Reference: omnirom/android_device_samsung_n5100, Ryogo-X/tolino_ntx_6sl_twrp
+# Rotation history (2026-09-05):
+#   v1: TW_ROTATION=270 → 180° upside-down (confirmed)
+#   v2: TW_ROTATION=0   → portrait/vertical (wrong for landscape device)
+#   v3: TW_ROTATION=90  → attempting correct landscape orientation
+#
+# MTK graphics stack may have additional rotation layer that
+# differs from standard TWRP behavior
 TW_THEME            := portrait_hdpi
-TW_ROTATION         := 0
+TW_ROTATION         := 90
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 255
 TW_DEFAULT_BRIGHTNESS := 128
 
-# Touchscreen coordinate adjustment for landscape tablet
-# Required: swap X/Y axes because physical screen is landscape but UI is portrait
-# Reference: Samsung Galaxy Note 10.1 uses same config
-RECOVERY_TOUCHSCREEN_SWAP_XY := true
-RECOVERY_TOUCHSCREEN_FLIP_Y := true
+# Touchscreen: DISABLED for v3
+# v2: SWAP_XY + FLIP_Y caused complete touch failure
+# Strategy: Fix screen rotation first, then calibrate touch coordinates
+# RECOVERY_TOUCHSCREEN_SWAP_XY := true
+# RECOVERY_TOUCHSCREEN_FLIP_Y := true
 TW_EXTRA_LANGUAGES := true
 TW_INCLUDE_REPACKTOOLS := true
