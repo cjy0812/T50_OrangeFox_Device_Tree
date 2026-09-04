@@ -84,16 +84,18 @@ BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 
 # vendor_boot recovery (OrangeFox)
 # Evidence: stock vendor_boot has 1 PLATFORM fragment (20.9 MB), no RECOVERY fragment
-# Evidence: BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true creates RECOVERY fragment
-#   → MediaTek bootloader only loads PLATFORM on normal boot → empty PLATFORM → bootloop
-# Evidence: unihertz-jelly-max (MT6878) sets this to empty for same reason
-# Solution: Set BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT to empty
-#   → AOSP does NOT create separate RECOVERY fragment
-#   → Recovery resources go into PLATFORM fragment (same as stock)
-#   → No RECOVERY fragment → MediaTek bootloader can load PLATFORM normally
+# Evidence: MediaTek bootloader only loads PLATFORM fragment on normal boot
+# Evidence: Setting BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT empty → no RECOVERY fragment
+#   BUT vendor_ramdisk (PLATFORM) is also empty (20 bytes) → bootloop
+# Evidence: Setting BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT true → RECOVERY fragment created
+#   → PLATFORM is empty → bootloop (MediaTek doesn't load RECOVERY fragment)
+# Solution: Build with BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
+#   → Creates both PLATFORM (vendor) + RECOVERY (recovery) fragments
+#   → Post-process with repack_vendor_boot.py to merge into single PLATFORM fragment
+#   → MediaTek bootloader can load PLATFORM normally, recovery content included
 FOX_VENDOR_BOOT_RECOVERY := 1
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
-BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT :=
+BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 BOARD_MOVE_GSI_AVB_KEYS_TO_VENDOR_BOOT := true
 
 # Partitions
