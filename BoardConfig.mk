@@ -131,12 +131,12 @@ BOARD_AVB_ENABLE := true
 
 # TWRP / OrangeFox UI
 # Screen rotation for landscape tablet (2400x1600)
-# Reference: Lenovo TB522FU uses landscape_hdpi + TW_ROTATION:=0
-# Reference: GPD XD+ (MTK tablet) uses landscape_hdpi + TW_ROTATION:=270 + touch adjustment
-TARGET_SCREEN_WIDTH  := 2400
-TARGET_SCREEN_HEIGHT := 1600
-TW_THEME            := landscape_hdpi
-TW_ROTATION         := 0
+# NOTE: OrangeFox R12.1 only has portrait_hdpi and watch_mdpi themes
+#       landscape_hdpi does NOT exist → causes "Theme selection failed" build error
+# Solution: Use portrait_hdpi + TW_ROTATION=270 to rotate UI to landscape
+# Reference: GPD XD+ (MTK tablet) uses portrait_hdpi + TW_ROTATION:=270
+TW_THEME            := portrait_hdpi
+TW_ROTATION         := 270
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 255
 TW_DEFAULT_BRIGHTNESS := 128
