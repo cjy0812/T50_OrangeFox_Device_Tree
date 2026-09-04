@@ -140,19 +140,19 @@ BOARD_AVB_ENABLE := true
 # Rotation history (2026-09-05):
 #   v1: TW_ROTATION=270 → 180° upside-down (confirmed)
 #   v2: TW_ROTATION=0   → portrait/vertical (wrong for landscape device)
-#   v3: TW_ROTATION=90  → attempting correct landscape orientation
+#   v3: TW_ROTATION=90  → BOOTLOOP (reverted)
+#   v4: TW_ROTATION=0   → safe baseline, fix other issues first
 #
-# MTK graphics stack may have additional rotation layer that
-# differs from standard TWRP behavior
+# Strategy: Fix pixel format + touch first, then rotation separately
 TW_THEME            := portrait_hdpi
-TW_ROTATION         := 90
+TW_ROTATION         := 0
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 255
 TW_DEFAULT_BRIGHTNESS := 128
 
-# Touchscreen: DISABLED for v3
+# Touchscreen: DISABLED
 # v2: SWAP_XY + FLIP_Y caused complete touch failure
-# Strategy: Fix screen rotation first, then calibrate touch coordinates
+# Will re-enable with correct combination after rotation is fixed
 # RECOVERY_TOUCHSCREEN_SWAP_XY := true
 # RECOVERY_TOUCHSCREEN_FLIP_Y := true
 TW_EXTRA_LANGUAGES := true
