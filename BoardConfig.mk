@@ -119,10 +119,10 @@ BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 TARGET_COPY_OUT_VENDOR := vendor
 
 # Recovery
-# Pixel format fix (2026-09-05): BGRA_8888 → RGBA_8888
-# Evidence: Vernee M5 (MTK platform, same as T50) uses RGBA_8888
-# BGRA caused red-blue channel swap → blue/purple tint on display
-TARGET_RECOVERY_PIXEL_FORMAT := RGBA_8888
+# Pixel format: BGRA_8888 (stock value, confirmed by ramdisk analysis)
+# Evidence: stock default.prop has ro.minui.pixel_format=BGRA_8888
+# WARNING: Changing to RGBA_8888 causes bootloop (v3 confirmed)
+TARGET_RECOVERY_PIXEL_FORMAT := BGRA_8888
 TARGET_USES_LOGD := true
 BOARD_HAS_NO_SELECT_BUTTON := true
 
@@ -133,27 +133,32 @@ ALLOW_MISSING_DEPENDENCIES := true
 BOARD_AVB_ENABLE := true
 
 # TWRP / OrangeFox UI
-# Screen for landscape tablet (2400x1600)
-# NOTE: OrangeFox R12.1 only has portrait_hdpi and watch_mdpi themes
-#       landscape_hdpi does NOT exist → causes "Theme selection failed" build error
+# Screen: landscape tablet 2400x1600 (physical landscape)
+# Theme: portrait_hdpi (OrangeFox R12.1 has no landscape theme)
 #
-# Rotation history (2026-09-05):
-#   v1: TW_ROTATION=270 → 180° upside-down (confirmed)
-#   v2: TW_ROTATION=0   → portrait/vertical (wrong for landscape device)
-#   v3: TW_ROTATION=90  → BOOTLOOP (reverted)
-#   v4: TW_ROTATION=0   → safe baseline, fix other issues first
+# Rotation configuration (v4, based on reverse engineering + MTK community):
+#   Evidence: stock ramdisk has ro.minui.default_rotation=ROTATION_RIGHT
+#   Evidence: stock ramdisk has ro.surface_flinger.primary_display_orientation=ORIENTATION_0
+#   Reference: Tec4Sho/android_device_alps_tb8163p3_bsp (MTK tablet, same pattern)
 #
-# Strategy: Fix pixel format + touch first, then rotation separately
+# History:
+#   v1: TW_ROTATION=270 only → 180° upside-down (missing HWROTATION/SF/TARGET)
+#   v2: TW_ROTATION=0 → portrait (wrong)
+#   v3: TW_ROTATION=90 + RGBA_8888 → BOOTLOOP (pixel format wrong)
+#   v4: Full rotation config matching stock + community reference
 TW_THEME            := portrait_hdpi
-TW_ROTATION         := 0
+TW_ROTATION         := 270
+TW_HWROTATION       := 270
+TARGET_RECOVERY_DEFAULT_ROTATION := ROTATION_RIGHT
+SF_PRIMARY_DISPLAY_ORIENTATION := 270
+TW_INPUT_ROTATION   := 270
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 255
 TW_DEFAULT_BRIGHTNESS := 128
 
-# Touchscreen: DISABLED
-# v2: SWAP_XY + FLIP_Y caused complete touch failure
-# Will re-enable with correct combination after rotation is fixed
+# Touchscreen: Goodix (v4l2 framework, from DTB analysis)
+# TW_INPUT_ROTATION handles touch coordinate rotation
+# RECOVERY_TOUCHSCREEN_* not needed for v4l2 touch
 # RECOVERY_TOUCHSCREEN_SWAP_XY := true
-# RECOVERY_TOUCHSCREEN_FLIP_Y := true
 TW_EXTRA_LANGUAGES := true
 TW_INCLUDE_REPACKTOOLS := true
